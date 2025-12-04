@@ -1,0 +1,14 @@
+/* poppins-300 - latin */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 300;
+  src: url('/fonts/pxiEyp8kv8JHgFVrJJbecnFHGPezSQ.woff2') format('woff2');
+}
+/* poppins-regular - latin */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/pxiByp8kv8JHgFVrLCz7V1s.woff2') format('woff2');
+}

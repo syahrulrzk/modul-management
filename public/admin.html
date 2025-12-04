@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Module Management System</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        dark: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Floating bubbles background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 25%),
+                radial-gradient(circle at 20% 70%, rgba(99, 102, 241, 0.08) 0%, transparent 15%),
+                radial-gradient(circle at 80% 60%, rgba(139, 92, 246, 0.07) 0%, transparent 20%);
+            z-index: -1;
+        }
+        
+        /* Animated floating bubbles */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, 0.1);
+            animation: float 15s infinite ease-in-out;
+            z-index: -1;
+        }
+        
+        .bubble:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .bubble:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            left: 80%;
+            animation-delay: 2s;
+        }
+        
+        .bubble:nth-child(3) {
+            width: 75px;
+            height: 75px;
+            top: 30%;
+            left: 70%;
+            animation-delay: 4s;
+        }
+        
+        .bubble:nth-child(4) {
+            width: 125px;
+            height: 125px;
+            top: 70%;
+            left: 15%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(10px, -10px) scale(1.1);
+            }
+            50% {
+                transform: translate(-10px, 10px) scale(0.9);
+            }
+            75% {
+                transform: translate(5px, 5px) scale(1.05);
+            }
+        }
+        
+        /* Responsive bubbles for mobile */
+        @media (max-width: 768px) {
+            .bubble:nth-child(1) {
+                width: 60px;
+                height: 60px;
+                top: 15%;
+                left: 10%;
+            }
+            
+            .bubble:nth-child(2) {
+                width: 90px;
+                height: 90px;
+                top: 70%;
+                left: 85%;
+            }
+            
+            .bubble:nth-child(3) {
+                width: 45px;
+                height: 45px;
+                top: 40%;
+                left: 75%;
+            }
+            
+            .bubble:nth-child(4) {
+                width: 75px;
+                height: 75px;
+                top: 80%;
+                left: 20%;
+            }
+            
+            @keyframes float {
+                0%, 100% {
+                    transform: translate(0, 0) scale(1);
+                }
+                25% {
+                    transform: translate(5px, -5px) scale(1.1);
+                }
+                50% {
+                    transform: translate(-5px, 5px) scale(0.9);
+                }
+                75% {
+                    transform: translate(3px, 3px) scale(1.05);
+                }
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .bubble:nth-child(1) {
+                width: 40px;
+                height: 40px;
+                top: 20%;
+                left: 15%;
+            }
+            
+            .bubble:nth-child(2) {
+                width: 60px;
+                height: 60px;
+                top: 75%;
+                left: 80%;
+            }
+            
+            .bubble:nth-child(3) {
+                width: 30px;
+                height: 30px;
+                top: 50%;
+                left: 80%;
+            }
+            
+            .bubble:nth-child(4) {
+                width: 50px;
+                height: 50px;
+                top: 85%;
+                left: 25%;
+            }
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .hero-bg {
+            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.2), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.2), transparent 40%);
+        }
+        
+        .upload-area {
+            border: 2px dashed rgba(139, 92, 246, 0.6);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #a78bfa;
+            background: rgba(139, 92, 246, 0.15);
+        }
+        
+        /* Enhanced module cards */
+        .module-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(139, 92, 246, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Editable module name */
+        .module-name-editable {
+            outline: none;
+            border: 1px dashed transparent;
+            padding: 2px 4px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .module-name-editable:focus {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            cursor: text;
+        }
+        
+        .module-name-editable:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Action buttons */
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Custom scrollbar */
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background-color: #1f2937;
+        }
+        
+        /* Modal styles */
+        .modal-success #modal-icon {
+            color: #10b981;
+        }
+        
+        .modal-error #modal-icon {
+            color: #ef4444;
+        }
+        
+        .modal-info #modal-icon {
+            color: #3b82f6;
+        }
+        
+        /* Enhanced modals */
+        #notification-modal .glass-card,
+        #delete-modal .glass-card {
+            background: rgba(30, 30, 46, 0.95);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Transparent navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: transparent; /* Made transparent */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Transparent footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: transparent; /* Made transparent */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Main content padding to account for fixed navbar and footer */
+        .main-content {
+            padding-top: 80px;
+            padding-bottom: 60px;
+        }
+        
+        /* Page transition animations */
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .page-transition.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Responsive behavior */
+        @media (max-width: 1280px) {
+            .grid-cols-1 xl\:grid-cols-3 gap-8 {
+                grid-template-columns: 1fr;
+            }
+            
+            .xl\:col-span-1 {
+                grid-column: span 1 / span 1;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-bg {
+                padding: 1rem;
+            }
+            
+            .grid {
+                gap: 1rem;
+            }
+            
+            .p-6 {
+                padding: 1rem;
+            }
+            
+            .text-4xl {
+                font-size: 2rem;
+            }
+            
+            .flex.justify-between.items-center.mb-2 {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .flex.space-x-2 {
+                margin-top: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .p-4 {
+                padding: 0.5rem;
+            }
+            
+            .p-6 {
+                padding: 0.75rem;
+            }
+            
+            .text-2xl {
+                font-size: 1.5rem;
+            }
+            
+            .text-xl {
+                font-size: 1.25rem;
+            }
+            
+            .flex.flex-col.md\:flex-row.justify-between.items-center {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .mb-4.md\:mb-0 {
+                margin-bottom: 1rem;
+            }
+            
+            .space-x-6 {
+                margin-top: 1rem;
+            }
+            
+            .space-x-6 > * {
+                margin-right: 1rem;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Floating bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <!-- Notification Modal -->
+    <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-start">
+                    <i id="modal-icon" class="fas fa-check-circle text-green-500 text-2xl mt-1 mr-3"></i>
+                    <div>
+                        <h3 id="modal-title" class="text-xl font-bold">Success!</h3>
+                        <p id="modal-message" class="text-gray-300 mt-2">Operation completed successfully.</p>
+                    </div>
+                </div>
+                <button onclick="hideModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="hideModal()" class="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-500 text-2xl mt-1 mr-3"></i>
+                    <div>
+                        <h3 class="text-xl font-bold">Confirm Delete</h3>
+                        <p class="text-gray-300 mt-2">Are you sure you want to delete this module?</p>
+                        <p id="delete-module-name" class="text-gray-400 mt-1 font-mono"></p>
+                    </div>
+                </div>
+                <button onclick="hideDeleteModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="hideDeleteModal()" class="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition">
+                    Cancel
+                </button>
+                <button id="confirm-delete-btn" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Verification Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-circle text-yellow-500 text-2xl mt-1 mr-3"></i>
+                    <div>
+                        <h3 class="text-xl font-bold">Confirm Upload</h3>
+                        <p class="text-gray-300 mt-2">Please verify the following details before uploading:</p>
+                    </div>
+                </div>
+                <button onclick="hideUploadModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <div class="bg-gray-800 rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-400">Module Name:</span>
+                        <span id="verify-module-name" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">File Name:</span>
+                        <span id="verify-file-name" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-gray-400">File Size:</span>
+                        <span id="verify-file-size" class="font-medium"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="hideUploadModal()" class="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition">
+                    Cancel
+                </button>
+                <button id="confirm-upload-btn" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 transition">
+                    Upload
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Progress Modal -->
+    <div id="progress-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-spinner fa-spin text-purple-500 text-2xl mt-1 mr-3"></i>
+                    <div>
+                        <h3 class="text-xl font-bold">Uploading...</h3>
+                        <p class="text-gray-300 mt-2" id="progress-text">Please wait while your file is being uploaded</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="progress-bar rounded-full h-4 bg-gray-700">
+                    <div id="progress-fill-modal" class="progress-fill rounded-full h-4 bg-gradient-to-r from-purple-500 to-indigo-500" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-sm mt-2">
+                    <span id="progress-status">Starting upload...</span>
+                    <span id="progress-percent-modal">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload History Modal -->
+    <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-2xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-history text-purple-500 text-2xl mt-1 mr-3"></i>
+                    <div>
+                        <h3 class="text-xl font-bold">Upload History</h3>
+                        <p class="text-gray-300 mt-2">View details of all uploaded modules</p>
+                    </div>
+                </div>
+                <button onclick="hideHistoryModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <div id="history-content" class="space-y-4">
+                    <!-- History items will be loaded here dynamically -->
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-history text-3xl mb-2"></i>
+                        <p>Loading upload history...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="hideHistoryModal()" class="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar flex items-center justify-between p-4 md:p-6">
+        <div class="container mx-auto max-w-6xl flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-graduation-cap text-xl md:text-2xl text-purple-500"></i>
+                <span class="text-lg md:text-xl font-bold">JAGOTI Modules</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-4 nav-links">
+                <a href="/" class="hover:text-purple-400 transition text-sm md:text-base">Home</a>
+                <a href="/modules" class="hover:text-purple-400 transition text-sm md:text-base">Modules</a>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-3 py-1 md:px-4 md:py-2 rounded-lg transition flex items-center text-sm md:text-base">
+                    <i class="fas fa-sign-out-alt mr-1 md:mr-2"></i>Logout
+                </button>
+            </div>
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-16 right-4 bg-gray-800 rounded-lg shadow-lg p-4 w-48 z-50">
+            <div class="flex flex-col space-y-3">
+                <a href="/" class="hover:text-purple-400 transition py-2">Home</a>
+                <a href="/modules" class="hover:text-purple-400 transition py-2">Modules</a>
+                <button id="mobile-logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition text-center">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+        
+        // Mobile logout button
+        document.getElementById('mobile-logout-btn').addEventListener('click', function() {
+            document.getElementById('logout-btn').click();
+        });
+    </script>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-bg py-8 md:py-12 px-4 page-transition">
+            <div class="container mx-auto max-w-6xl">
+                <div class="text-center mb-8 md:mb-10">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-3 md:mb-4">Admin Dashboard</h1>
+                    <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto">
+                        Manage your e-learning modules with ease. Upload new modules, delete existing ones, and monitor your content.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Upload Module Card -->
+                    <div class="glass-card rounded-2xl p-6 lg:col-span-1">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-cloud-upload-alt text-purple-500 mr-3"></i>
+                            Upload New Module
+                        </h2>
+                        
+                        <form id="upload-form" class="space-y-6">
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">Module Name</label>
+                                <input type="text" id="module-name" name="moduleName" class="form-input w-full px-3 py-2 md:px-4 md:py-3 rounded-lg bg-gray-800 border border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition text-sm md:text-base" placeholder="Enter custom module name" required>
+                                <p class="text-gray-400 text-xs md:text-sm mt-1">This will be used as the module identifier and URL</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-300 mb-2">Module File (.zip)</label>
+                                <div id="upload-area" class="upload-area rounded-lg p-6 md:p-8 text-center cursor-pointer">
+                                    <i class="fas fa-file-archive text-3xl md:text-4xl text-purple-500 mb-3 md:mb-4"></i>
+                                    <p class="mb-2 text-sm md:text-base">Drag & drop your .zip file here</p>
+                                    <p class="text-gray-400 text-xs md:text-sm mb-3 md:mb-4">or</p>
+                                    <button type="button" id="browse-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-4 py-2 md:px-6 md:py-2 rounded-lg transition transform hover:-translate-y-0.5 shadow-lg text-sm md:text-base">
+                                        Browse Files
+                                    </button>
+                                    <input type="file" id="module-file" name="module" accept=".zip" class="hidden" required>
+                                    <div id="file-info" class="mt-3 md:mt-4 text-xs md:text-sm text-gray-400 hidden"></div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" id="upload-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 py-2 md:py-3 rounded-lg font-medium transition flex items-center justify-center transform hover:-translate-y-0.5 shadow-lg text-sm md:text-base">
+                                <i class="fas fa-upload mr-2"></i>
+                                Upload Module
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Manage Modules Card -->
+                    <div class="glass-card rounded-2xl p-6 lg:col-span-2">
+                        <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center">
+                            <i class="fas fa-cogs text-purple-500 mr-2 md:mr-3 text-lg md:text-xl"></i>
+                            <span class="text-base md:text-xl">Manage Modules</span>
+                        </h2>
+                        
+                        <div class="mb-3 md:mb-4 flex justify-between items-center">
+                            <h3 class="text-base md:text-lg font-semibold">Existing Modules</h3>
+                            <div class="flex space-x-2 items-center">
+                                <button id="history-btn" class="text-gray-400 hover:text-white action-btn text-sm md:text-base" title="Upload History">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="modules-list" class="space-y-4 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+                            <!-- Modules will be loaded here dynamically -->
+                            <div class="glass-card rounded-lg p-4 animate-pulse">
+                                <div class="h-4 bg-gray-700 rounded mb-3"></div>
+                                <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                            </div>
+                            <div class="glass-card rounded-lg p-4 animate-pulse">
+                                <div class="h-4 bg-gray-700 rounded mb-3"></div>
+                                <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="py-12 px-4 page-transition">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">System Overview</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+                    <div class="glass-card rounded-2xl p-4 md:p-6 text-center module-card hover:cursor-pointer transform hover:-translate-y-1">
+                        <div class="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-purple-500 bg-opacity-20 mb-3 md:mb-4 mx-auto">
+                            <i class="fas fa-book text-xl md:text-2xl text-purple-400"></i>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-bold mb-1 md:mb-2" id="total-modules">0</h3>
+                        <p class="text-gray-300 text-sm md:text-base">Total Modules</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 md:p-6 text-center module-card transform hover:-translate-y-1">
+                        <div class="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-500 bg-opacity-20 mb-3 md:mb-4 mx-auto">
+                            <i class="fas fa-users text-xl md:text-2xl text-blue-400"></i>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-bold mb-1 md:mb-2">0</h3>
+                        <p class="text-gray-300 text-sm md:text-base">Active Users</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 md:p-6 text-center module-card transform hover:-translate-y-1">
+                        <div class="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-green-500 bg-opacity-20 mb-3 md:mb-4 mx-auto">
+                            <i class="fas fa-chart-line text-xl md:text-2xl text-green-400"></i>
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-bold mb-1 md:mb-2">0</h3>
+                        <p class="text-gray-300 text-sm md:text-base">Completed Courses</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer border-t border-gray-800 py-3 md:py-4 px-4 bg-transparent">
+        <div class="container mx-auto max-w-6xl">
+            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                <div class="flex items-center space-x-2 mb-3 md:mb-0">
+                    <p class="text-xs md:text-sm">&copy; 2025 JAGOTI. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-4 md:space-x-6">
+                    <a href="#" class="hover:text-purple-400 transition text-lg md:text-xl"><i class="fab fa-github"></i></a>
+                    <a href="#" class="hover:text-purple-400 transition text-lg md:text-xl"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="hover:text-purple-400 transition text-lg md:text-xl"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const uploadForm = document.getElementById('upload-form');
+        const uploadArea = document.getElementById('upload-area');
+        const moduleFile = document.getElementById('module-file');
+        const moduleNameInput = document.getElementById('module-name');
+        const fileInfo = document.getElementById('file-info');
+        const browseBtn = document.getElementById('browse-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        
+        // Event Listeners
+        browseBtn.addEventListener('click', () => {
+            moduleFile.click();
+        });
+        
+        moduleFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileInfo.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileInfo.classList.remove('hidden');
+                
+                // Auto-fill module name from file name if empty
+                if (!moduleNameInput.value) {
+                    const fileNameWithoutExt = file.name.replace('.zip', '');
+                    moduleNameInput.value = fileNameWithoutExt;
+                }
+            } else {
+                fileInfo.classList.add('hidden');
+            }
+        });
+        
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/zip') {
+                // Create a DataTransfer object to set the file
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                moduleFile.files = dataTransfer.files;
+                
+                fileInfo.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileInfo.classList.remove('hidden');
+                
+                // Auto-fill module name from file name if empty
+                if (!moduleNameInput.value) {
+                    const fileNameWithoutExt = file.name.replace('.zip', '');
+                    moduleNameInput.value = fileNameWithoutExt;
+                }
+            }
+        });
+        
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const file = moduleFile.files[0];
+            const moduleName = moduleNameInput.value.trim();
+            
+            if (!file) {
+                showModal('Error', 'Please select a file to upload', 'error');
+                return;
+            }
+            
+            if (!moduleName) {
+                showModal('Error', 'Please enter a module name', 'error');
+                return;
+            }
+            
+            // Show upload verification modal
+            const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+            showUploadModal(moduleName, file.name, fileSize);
+        });
+        
+        // Reset upload button
+        function resetUploadButton() {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-upload mr-2"></i> Upload Module';
+        }
+        
+        // Perform actual upload
+        async function performUpload() {
+            const file = moduleFile.files[0];
+            const moduleName = moduleNameInput.value.trim();
+            
+            if (!file || !moduleName) {
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('module', file);
+            formData.append('moduleName', moduleName);
+            
+            try {
+                // Show progress modal
+                const progressModal = document.getElementById('progress-modal');
+                const progressFill = document.getElementById('progress-fill-modal');
+                const progressPercent = document.getElementById('progress-percent-modal');
+                const progressStatus = document.getElementById('progress-status');
+                
+                progressFill.style.width = '0%';
+                progressPercent.textContent = '0%';
+                progressStatus.textContent = 'Starting upload...';
+                progressModal.classList.remove('hidden');
+                
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...';
+                
+                // Create XMLHttpRequest for progress tracking
+                const xhr = new XMLHttpRequest();
+                
+                // Send request
+                xhr.open('POST', '/api/upload');
+                
+                // Add authorization header
+                const token = localStorage.getItem('adminToken');
+                console.log('Token retrieved:', token);
+                if (token) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                } else {
+                    console.error('No token found in localStorage');
+                    throw new Error('Authentication token not found. Please log in again.');
+                }
+                
+                // Track upload progress
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        progressFill.style.width = percentComplete + '%';
+                        progressPercent.textContent = percentComplete + '%';
+                        progressStatus.textContent = `Uploaded ${formatBytes(e.loaded)} of ${formatBytes(e.total)}`;
+                    }
+                });
+                
+                // Handle response
+                xhr.addEventListener('load', () => {
+                    console.log('Upload response status:', xhr.status);
+                    console.log('Upload response text:', xhr.responseText);
+                    // Hide progress modal
+                    progressModal.classList.add('hidden');
+                    
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            showModal('Upload Successful', `Module uploaded successfully! ${response.message}`, 'success');
+                            uploadForm.reset();
+                            fileInfo.classList.add('hidden');
+                            loadModules();
+                            updateStats();
+                        } else {
+                            showModal('Upload Failed', response.error || 'Upload failed', 'error');
+                        }
+                    } else {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            showModal('Error', errorResponse.error || 'Upload failed with status: ' + xhr.status, 'error');
+                        } catch (e) {
+                            showModal('Error', 'Upload failed with status: ' + xhr.status, 'error');
+                        }
+                    }
+                    resetUploadButton();
+                });
+                
+                xhr.addEventListener('error', (event) => {
+                    console.error('Upload error event:', event);
+                    // Hide progress modal
+                    progressModal.classList.add('hidden');
+                    showModal('Error', 'Upload failed: Network error occurred', 'error');
+                    resetUploadButton();
+                });
+                xhr.send(formData);
+            } catch (error) {
+                console.error('Upload error:', error);
+                // Hide progress modal
+                const progressModal = document.getElementById('progress-modal');
+                if (progressModal) {
+                    progressModal.classList.add('hidden');
+                }
+                showModal('Upload Error', 'An unexpected error occurred during upload: ' + error.message, 'error');
+                resetUploadButton();
+            }
+        }
+        
+        // Helper function to format bytes
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Load modules
+        async function loadModules() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/modules', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                const data = await response.json();
+                
+                const modulesList = document.getElementById('modules-list');
+                
+                if (data.modules && data.modules.length > 0) {
+                    modulesList.innerHTML = data.modules.map(module => `
+                        <div class="glass-card rounded-lg p-4 module-card" data-module="${module}">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold capitalize module-name-editable" 
+                                    data-module="${module}" 
+                                    onclick="enableEdit(this)">
+                                    ${module.replace(/-/g, ' ')}
+                                </h4>
+                                <div class="flex space-x-2">
+                                    <a href="/modules/${module}" target="_blank" 
+                                       class="action-btn text-blue-500 hover:text-blue-400" 
+                                       title="Open module">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <button onclick="saveModuleName('${module}')" 
+                                            class="action-btn text-green-500 hover:text-green-400 hidden" 
+                                            title="Save changes">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    <button onclick="showDeleteModal('${module}')" 
+                                            class="action-btn text-red-500 hover:text-red-400" 
+                                            title="Delete module">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-400 mt-2 flex items-center">
+                                <i class="fas fa-link mr-2"></i>
+                                <span class="font-mono text-xs">/modules/${module}/</span>
+                                <button onclick="copyModuleLink('${module}')" 
+                                        class="ml-2 text-gray-500 hover:text-white action-btn" 
+                                        title="Copy link">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    modulesList.innerHTML = `
+                        <div class="text-center py-8 text-gray-400">
+                            <i class="fas fa-box-open text-3xl mb-2"></i>
+                            <p>No modules available</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading modules:', error);
+                showModal('Load Error', 'Failed to load modules. Please refresh the page.', 'error');
+                document.getElementById('modules-list').innerHTML = `
+                    <div class="text-center py-8 text-red-400">
+                        <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                        <p>Failed to load modules</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Delete module
+        async function deleteModule(moduleName) {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ moduleName }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showModal('Module Deleted', `Successfully deleted module: ${moduleName}`, 'success');
+                    loadModules();
+                    updateStats();
+                } else {
+                    showModal('Deletion Failed', data.error || 'Delete failed', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                showModal('Deletion Error', 'An unexpected error occurred while deleting the module. Please try again.', 'error');
+            }
+        }
+        
+        // Enable edit mode for module name
+        function enableEdit(element) {
+            element.contentEditable = true;
+            element.focus();
+            
+            // Select all text for easier editing
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            
+            // Show save button
+            const moduleCard = element.closest('.module-card');
+            const moduleName = moduleCard.dataset.module;
+            const saveBtn = moduleCard.querySelector('.fa-save').closest('button');
+            saveBtn.classList.remove('hidden');
+            
+            // Add event listener for saving on Enter key
+            element.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveModuleName(moduleName);
+                }
+            });
+        }
+        
+        // Save module name
+        async function saveModuleName(oldName) {
+            const moduleCard = document.querySelector(`[data-module="${oldName}"]`);
+            const nameElement = moduleCard.querySelector('.module-name-editable');
+            const newName = nameElement.textContent.trim();
+            
+            // Validate new name
+            if (!newName) {
+                showModal('Invalid Name', 'Module name cannot be empty.', 'error');
+                return;
+            }
+            
+            // Send request to rename the module
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/rename', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ 
+                        oldName: oldName,
+                        newName: newName
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showModal('Module Renamed', `Successfully renamed module to "${newName}"`, 'success');
+                    
+                    // Update the module card with new name
+                    moduleCard.dataset.module = data.newName;
+                    nameElement.dataset.module = data.newName;
+                    
+                    // Update the delete button
+                    const deleteBtn = moduleCard.querySelector('.fa-trash').closest('button');
+                    deleteBtn.onclick = function() {
+                        showDeleteModal(data.newName);
+                    };
+                    
+                    // Update the open link
+                    const openLink = moduleCard.querySelector('.fa-external-link-alt').closest('a');
+                    openLink.href = `/modules/${data.newName}`;
+                    
+                    // Update the copy link button
+                    const copyBtn = moduleCard.querySelector('.fa-copy').closest('button');
+                    copyBtn.onclick = function() {
+                        copyModuleLink(data.newName);
+                    };
+                    
+                    // Update the save button
+                    const saveBtn = moduleCard.querySelector('.fa-save').closest('button');
+                    saveBtn.onclick = function() {
+                        saveModuleName(data.newName);
+                    };
+                    
+                    // Update the path display
+                    const pathElement = moduleCard.querySelector('.font-mono');
+                    if (pathElement) {
+                        pathElement.textContent = `/modules/${data.newName}/`;
+                    }
+                    
+                    // Disable edit mode
+                    nameElement.contentEditable = false;
+                    
+                    // Hide save button
+                    saveBtn.classList.add('hidden');
+                    
+                    // Update stats
+                    updateStats();
+                } else {
+                    showModal('Rename Failed', data.error || 'Failed to rename module', 'error');
+                }
+            } catch (error) {
+                console.error('Rename error:', error);
+                showModal('Rename Error', 'An unexpected error occurred while renaming the module. Please try again.', 'error');
+            }
+        }
+        
+        // Copy module link to clipboard
+        function copyModuleLink(moduleName) {
+            const link = `${window.location.origin}/modules/${moduleName}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showModal('Link Copied', 'Module link copied to clipboard successfully!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy link: ', err);
+                showModal('Copy Failed', 'Failed to copy link to clipboard.', 'error');
+            });
+        }
+        
+        // Update stats
+        async function updateStats() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/modules', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('total-modules').textContent = data.modules ? data.modules.length : 0;
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+        
+        // Show modal notification
+        function showModal(title, message, type = 'success') {
+            const modal = document.getElementById('notification-modal');
+            const titleEl = document.getElementById('modal-title');
+            const messageEl = document.getElementById('modal-message');
+            const iconEl = document.getElementById('modal-icon');
+            
+            // Clear previous styles
+            modal.classList.remove('modal-success', 'modal-error', 'modal-info');
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            if (type === 'success') {
+                iconEl.className = 'fas fa-check-circle text-2xl mt-1 mr-3';
+                modal.classList.add('modal-success');
+            } else if (type === 'error') {
+                iconEl.className = 'fas fa-exclamation-circle text-2xl mt-1 mr-3';
+                modal.classList.add('modal-error');
+            } else {
+                iconEl.className = 'fas fa-info-circle text-2xl mt-1 mr-3';
+                modal.classList.add('modal-info');
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        // Hide modal
+        function hideModal() {
+            const modal = document.getElementById('notification-modal');
+            modal.classList.add('hidden');
+        }
+        
+        // Show delete confirmation modal
+        function showDeleteModal(moduleName) {
+            const deleteModal = document.getElementById('delete-modal');
+            const moduleNameEl = document.getElementById('delete-module-name');
+            
+            moduleNameEl.textContent = moduleName;
+            deleteModal.classList.remove('hidden');
+            
+            // Set up the confirm button
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            confirmBtn.onclick = function() {
+                deleteModule(moduleName);
+                hideDeleteModal();
+            };
+        }
+        
+        // Hide delete confirmation modal
+        function hideDeleteModal() {
+            const deleteModal = document.getElementById('delete-modal');
+            deleteModal.classList.add('hidden');
+        }
+        
+        // Show upload verification modal
+        function showUploadModal(moduleName, fileName, fileSize) {
+            const uploadModal = document.getElementById('upload-modal');
+            const moduleNameEl = document.getElementById('verify-module-name');
+            const fileNameEl = document.getElementById('verify-file-name');
+            const fileSizeEl = document.getElementById('verify-file-size');
+            
+            moduleNameEl.textContent = moduleName;
+            fileNameEl.textContent = fileName;
+            fileSizeEl.textContent = fileSize;
+            
+            uploadModal.classList.remove('hidden');
+            
+            // Set up the confirm button
+            const confirmBtn = document.getElementById('confirm-upload-btn');
+            confirmBtn.onclick = function() {
+                hideUploadModal();
+                // Perform the upload
+                performUpload();
+            };
+        }
+        
+        // Hide upload verification modal
+        function hideUploadModal() {
+            const uploadModal = document.getElementById('upload-modal');
+            uploadModal.classList.add('hidden');
+        }
+        
+
+        
+        // History button
+        document.getElementById('history-btn').addEventListener('click', () => {
+            showHistoryModal();
+        });
+        
+        // Show history modal
+        function showHistoryModal() {
+            const historyModal = document.getElementById('history-modal');
+            historyModal.classList.remove('hidden');
+            loadUploadHistory();
+        }
+        
+        // Hide history modal
+        function hideHistoryModal() {
+            const historyModal = document.getElementById('history-modal');
+            historyModal.classList.add('hidden');
+        }
+        
+        // Load upload history
+        async function loadUploadHistory() {
+            const historyContent = document.getElementById('history-content');
+            historyContent.innerHTML = `
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-history text-3xl mb-2"></i>
+                    <p>Loading upload history...</p>
+                </div>
+            `;
+            
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/upload-history', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch upload history');
+                }
+                
+                const data = await response.json();
+                
+                if (data.history && data.history.length > 0) {
+                    historyContent.innerHTML = data.history.map(item => `
+                        <div class="glass-card rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-bold capitalize ${(item.moduleName.startsWith('BLOCKED_')) ? 'text-red-400' : ''}">
+                                    ${(item.moduleName.startsWith('BLOCKED_')) ? 'BLOCKED: ' : ''}${item.moduleName.replace(/BLOCKED_\d+_/, '').replace(/-/g, ' ')}
+                                </h4>
+                                <span class="text-xs ${(item.moduleName.startsWith('BLOCKED_')) ? 'bg-red-900/50' : 'bg-purple-900/50'} px-2 py-1 rounded">${formatDate(item.uploadTimestamp)}</span>
+                            </div>
+                            <div class="text-sm text-gray-300 grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+                                <div>
+                                    <span class="text-gray-400">File:</span>
+                                    <span class="ml-2">${item.fileName}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">Size:</span>
+                                    <span class="ml-2">${formatFileSize(item.fileSize)}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">Uploader:</span>
+                                    <span class="ml-2">${item.uploader}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">Module:</span>
+                                    <span class="ml-2 font-mono text-xs">${item.moduleName.replace(/BLOCKED_\d+_/, '')}</span>
+                                </div>
+                                ${(item.moduleName.startsWith('BLOCKED_')) ? '<div class="col-span-1 md:col-span-2 mt-2"><span class="text-red-400 text-xs"><i class="fas fa-exclamation-triangle mr-1"></i>Blocked due to security policy violation</span></div>' : ''}
+                            </div>
+
+                        </div>
+                    `).join('');
+                } else {
+                    historyContent.innerHTML = `
+                        <div class="text-center py-8 text-gray-400">
+                            <i class="fas fa-history text-3xl mb-2"></i>
+                            <p>No upload history available</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading upload history:', error);
+                historyContent.innerHTML = `
+                    <div class="text-center py-8 text-red-400">
+                        <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                        <p>Failed to load upload history</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Helper function to format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Helper function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Logout function
+        function logout() {
+            // Call server logout endpoint
+            fetch('/api/admin/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }).finally(() => {
+                // Remove token from localStorage
+                localStorage.removeItem('adminToken');
+                // Redirect to home page
+                window.location.href = '/';
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add event listener to logout button
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+            
+            loadModules();
+            updateStats();
+        });
+    </script>
+    <script>
+        // Trigger page transition animation on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.body.classList.add('loaded');
+                
+                // Apply transition to main sections
+                const sections = document.querySelectorAll('section');
+                sections.forEach((section, index) => {
+                    setTimeout(() => {
+                        section.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                        section.style.opacity = '1';
+                        section.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 100);
+        });
+    </script>
+    <script>
+        // Check if user is authenticated
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                // Redirect to login page
+                window.location.href = '/admin/login';
+            }
+        });
+    </script>
+</body>
+</html>

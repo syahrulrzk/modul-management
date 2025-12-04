@@ -67,19 +67,42 @@ A comprehensive e-learning module management system built with Node.js, Express,
    ```
 
 4. **Database Setup:**
-   The application uses SQLite for data storage. The database will be created automatically when you first run the application.
-   
-   To initialize the database manually:
+   The application uses SQLite for data storage. Initialize the database schema:
    ```bash
    npm run migrate
    ```
+   
+   This will create the database file (`dev.db`) and set up the required tables:
+   - `User` table for admin authentication
+   - `UploadHistory` table for tracking file uploads
+   
+   **Database Schema Details:**
+   - User table: `id`, `username`, `password` (hashed), `createdAt`, `updatedAt`
+   - UploadHistory table: `id`, `moduleName`, `fileName`, `fileSize`, `uploadTimestamp`, `uploader`
+   
+   **Database Management Commands:**
+   ```bash
+   # Check current database status
+   npm run migrate status
+   
+   # Create a new migration after schema changes
+   npm run migrate dev
+   
+   # Apply migrations in production
+   npm run migrate:deploy
+   ```
 
 5. **Create an admin user:**
-   The first time you run the application, an admin user will be created with:
+   The system automatically creates an initial admin user on first run:
    - Username: admin
    - Password: admin123
    
    **Important:** Change this password immediately after first login for security.
+
+6. **Start the application:**
+   ```bash
+   npm start
+   ```
 
 ### Running the Application
 
@@ -138,8 +161,29 @@ To change the admin password, use the provided script:
 node change-password.js newpassword123
 ```
 
-### Changing JWT Secret
+### Admin Password Management
+
+#### Changing Password
+To change the admin password, use the provided script:
+```bash
+node change-password.js newpassword123
+```
+
+You can also change the password through the admin panel after logging in.
+
+#### Changing JWT Secret
 Update the JWT_SECRET value in your `.env` file. Note that this will invalidate all existing sessions.
+
+#### Manual Password Reset
+If you need to manually reset the admin password in the database:
+```bash
+node -e "const bcrypt = require('bcryptjs'); console.log(bcrypt.hashSync('newpassword', 10));" 
+```
+
+Then update the password hash in the User table:
+```sql
+UPDATE User SET password = 'hashed_password_here' WHERE username = 'admin';
+```
 
 ## Usage Guidelines
 
@@ -168,14 +212,22 @@ Update the JWT_SECRET value in your `.env` file. Note that this will invalidate 
 
 ## API Endpoints
 
-- `GET /api/modules` - List all modules
-- `GET /api/module/:id` - Get specific module details
-- `POST /api/upload` - Upload new module (admin only)
-- `DELETE /api/module/:id` - Delete module (admin only)
-- `POST /api/rename` - Rename module (admin only)
+### Public Endpoints
+- `GET /` - Home page
+- `GET /modules` - Modules listing page
+- `GET /modules/:moduleName/*` - Access module content
+- `GET /admin/login` - Admin login page
 - `POST /api/admin/login` - Admin authentication
 - `POST /api/admin/logout` - Admin logout
-- `GET /api/upload-history` - Get upload history (admin only)
+
+### Admin-Only Endpoints
+- `GET /admin` - Admin dashboard
+- `GET /api/modules` - List all modules
+- `POST /api/upload` - Upload new module
+- `POST /api/delete` - Delete module
+- `POST /api/rename` - Rename module
+- `GET /api/upload-history` - Get upload history
+- `DELETE /api/upload-history/:id` - Delete upload history record
 - `GET /api/recent-module` - Get most recently uploaded module
 
 ## Deployment
@@ -224,6 +276,44 @@ Update the JWT_SECRET value in your `.env` file. Note that this will invalidate 
    ```bash
    # Add to crontab for daily backups
    0 2 * * * /usr/bin/sqlite3 /path/to/dev.db .dump > /path/to/backups/dev-$(date +\%Y\%m\%d).sql
+   ```
+   
+   **Database Backup and Recovery:**
+   
+   To backup the database:
+   ```bash
+   sqlite3 dev.db .dump > backup-$(date +%Y%m%d).sql
+   ```
+   
+   To restore from a backup:
+   ```bash
+   # Remove the current database
+   rm dev.db
+   
+   # Restore from backup
+   sqlite3 dev.db < backup-file.sql
+   
+   # Run migrations to ensure schema is up to date
+   npm run migrate
+   ```
+   
+   **Direct Database Access:**
+   
+   To directly access the database for queries or troubleshooting:
+   ```bash
+   sqlite3 dev.db
+   ```
+   
+   Common queries:
+   ```sql
+   -- List all users
+   SELECT * FROM User;
+   
+   -- List recent uploads
+   SELECT * FROM UploadHistory ORDER BY uploadTimestamp DESC LIMIT 10;
+   
+   -- Count total modules
+   SELECT COUNT(*) FROM UploadHistory WHERE moduleName NOT LIKE 'BLOCKED_%';
    ```
 
 ### Security Recommendations

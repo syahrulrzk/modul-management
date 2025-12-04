@@ -19,3 +19,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model UploadHistory {
+  id            Int      @id @default(autoincrement())
+  moduleName    String
+  fileName      String
+  fileSize      Int?
+  uploadTimestamp DateTime @default(now())
+  uploader      String?
+}

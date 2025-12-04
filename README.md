@@ -153,8 +153,11 @@ npm run production
 - Logging of security events and blocked uploads
 - Regular security audits and updates
 
-## Changing Admin Credentials
-
+## Create Admin Credentials
+To change the admin password, use the provided script:
+```bash
+node create-admin.js
+```
 ### Changing Password
 To change the admin password, use the provided script:
 ```bash

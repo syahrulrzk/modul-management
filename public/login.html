@@ -100,9 +100,14 @@
 
                 <div>
                     <label class="text-white font-bold text-sm">Password</label>
-                    <input type="password" id="password"
-                        class="w-full mt-1 px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-purple-500 focus:ring-purple-500"
-                        required />
+                    <div class="relative">
+                        <input type="password" id="password"
+                            class="w-full mt-1 px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-purple-500 focus:ring-purple-500 pr-12"
+                            required />
+                        <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <button id="login-btn" type="submit"
@@ -136,6 +141,22 @@
 
             setTimeout(() => box.classList.remove("show"), 3000);
         }
+
+        // Toggle password visibility
+        document.getElementById("toggle-password").addEventListener("click", function() {
+            const passwordInput = document.getElementById("password");
+            const eyeIcon = this.querySelector("i");
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            }
+        });
 
         document.getElementById("login-form").addEventListener("submit", async (e) => {
             e.preventDefault();

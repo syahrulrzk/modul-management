@@ -25,7 +25,12 @@ RUN adduser -S nextjs -u 1001
 
 # Change ownership of app directory
 RUN chown -R nextjs:nodejs /app
+# Set proper permissions for directories that will be mounted as volumes
+RUN chown -R nextjs:nodejs /app/uploads /app/modules
 USER nextjs
 
-# Start the application
-CMD ["node", "server.js"]
+# Copy entrypoint script with executable permissions
+COPY --chmod=755 entrypoint.sh /entrypoint.sh
+
+# Use entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]

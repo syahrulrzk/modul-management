@@ -582,7 +582,8 @@ app.post('/api/upload', uploadLimiter, authenticateAdmin, upload.single('module'
       success: false, 
       error: 'Failed to extract module',
       details: err.message,
-      stack: err.stack
+      // Don't expose stack trace in production
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 });
@@ -606,7 +607,11 @@ app.post('/api/delete', authenticateAdmin, (req, res) => {
     // Remove module directory
     fs.rm(modulePath, { recursive: true }, (err) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to delete module' });
+        console.error('Failed to delete module:', err);
+        return res.status(500).json({ 
+          error: 'Failed to delete module', 
+          details: err.message 
+        });
       }
       
       res.json({ 
@@ -633,6 +638,34 @@ app.get('/api/upload-history', authenticateAdmin, (req, res) => {
     }
     
     res.json({ history: rows });
+  });
+});
+
+// DELETE /api/upload-history/:id - Delete an upload history record
+app.delete('/api/upload-history/:id', authenticateAdmin, (req, res) => {
+  const id = req.params.id;
+  
+  // Validate ID
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ error: 'Valid history record ID is required' });
+  }
+  
+  // Delete the record
+  db.run('DELETE FROM UploadHistory WHERE id = ?', [id], function(err) {
+    if (err) {
+      console.error('Delete history error:', err);
+      return res.status(500).json({ error: 'Failed to delete upload history record' });
+    }
+    
+    // Check if any row was affected
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Upload history record not found' });
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Upload history record deleted successfully' 
+    });
   });
 });
 

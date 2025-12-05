@@ -1,0 +1,54 @@
+# Dependencies
+node_modules
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+logs
+*.log
+
+# Runtime data
+tmp/
+temp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git files
+.git
+.gitignore
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build output
+dist/
+build/
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# PM2
+.pm2/
+
+# dotenv files
+.env.vault
+.env.me

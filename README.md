@@ -36,8 +36,8 @@ A comprehensive e-learning module management system built with Node.js, Express,
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm (v6 or higher)
+- Node.js (v20 or higher)
+- npm (v8 or higher)
 - Git (for cloning the repository)
 
 ### Setup Instructions
@@ -115,6 +115,30 @@ Or for production:
 ```bash
 npm run production
 ```
+
+### Running with Docker
+
+**Note:** Docker images use Node.js 20-alpine to ensure compatibility with Prisma 7.
+
+1. **Build and run with Docker Compose:**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Build and run with Docker only:**
+   ```bash
+   # Build the image
+   docker build -t module-management .
+   
+   # Run the container
+   docker run -d \
+     -p 3000:3000 \
+     -v $(pwd)/uploads:/app/uploads \
+     -v $(pwd)/modules:/app/modules \
+     -v $(pwd)/dev.db:/app/dev.db \
+     --name module-management \
+     module-management
+   ```
 
 ### Access the Application
 
@@ -237,29 +261,7 @@ UPDATE User SET password = 'hashed_password_here' WHERE username = 'admin';
 
 ### Production Deployment
 
-1. **Set up a reverse proxy (Nginx recommended):**
-   ```nginx
-   server {
-       listen 80;
-       server_name your-domain.com;
-       
-       location / {
-           proxy_pass http://localhost:3000;
-           proxy_http_version 1.1;
-           proxy_set_header Upgrade $http_upgrade;
-           proxy_set_header Connection 'upgrade';
-           proxy_set_header Host $host;
-           proxy_cache_bypass $http_upgrade;
-       }
-   }
-   ```
-
-2. **Enable HTTPS with Let's Encrypt:**
-   ```bash
-   sudo certbot --nginx -d your-domain.com
-   ```
-
-3. **Configure environment variables for production:**
+1. **Configure environment variables for production:**
    ```
    NODE_ENV=production
    PORT=3000
@@ -267,7 +269,7 @@ UPDATE User SET password = 'hashed_password_here' WHERE username = 'admin';
    ADMIN_SECRET_KEY=your_admin_secret_key_here
    ```
 
-4. **Run with a process manager (PM2 recommended):**
+2. **Run with a process manager (PM2 recommended):**
    ```bash
    npm install -g pm2
    pm2 start server.js --name module-management
@@ -275,7 +277,12 @@ UPDATE User SET password = 'hashed_password_here' WHERE username = 'admin';
    pm2 save
    ```
 
-5. **Set up automatic backups:**
+3. **Or run with Docker (recommended for containerized environments):**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Set up automatic backups:**
    ```bash
    # Add to crontab for daily backups
    0 2 * * * /usr/bin/sqlite3 /path/to/dev.db .dump > /path/to/backups/dev-$(date +\%Y\%m\%d).sql

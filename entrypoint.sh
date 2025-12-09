@@ -6,5 +6,8 @@ chmod -R 777 /app/modules 2>/dev/null || true
 chmod -R 777 /app/uploads 2>/dev/null || true
 chmod 666 /app/dev.db 2>/dev/null || true
 
+# Ensure database migrations are applied
+npx prisma migrate deploy 2>/dev/null || true
+
 # Start the application
 exec node server.js
